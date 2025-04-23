@@ -14,6 +14,8 @@ const posts: Post[] = [
   },
 ];
 
+
+
 export const postRouter = createTRPCRouter({
   hello: publicProcedure
     .input(z.object({ text: z.string() }))
@@ -37,4 +39,34 @@ export const postRouter = createTRPCRouter({
   getLatest: publicProcedure.query(() => {
     return posts.at(-1) ?? null;
   }),
+});
+
+export const analysisRouter = createTRPCRouter({
+  chat: publicProcedure
+    .input(z.object({ message: z.string(), context: z.record(z.string(), z.any()) }))
+    .mutation(async ({ input }) => {
+      const response = await fetch("http://localhost:5000/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: input.message, context: input.context }),
+      });
+      return response.json();
+    }),
+
+  analyze: publicProcedure
+    .input(z.object({ message: z.string() }))
+    .mutation(async ({ input }) => {
+      // Simulate a long-running task
+      const response = await fetch("http://localhost:5000/start-search", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ content: input.message }),
+      });
+
+      return response.json();
+    }),
 });
