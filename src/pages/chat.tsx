@@ -115,7 +115,6 @@ const Dashboard: React.FC<DashboardProps> = ({ scores, justifications }) => {
 
 };
 
-// LoadingScreen component with sexy animations and tooltips
 const LoadingScreen: React.FC = () => {
     const tooltips = [
         "Analyzing data...",
@@ -123,62 +122,60 @@ const LoadingScreen: React.FC = () => {
         "Evaluating risk...",
         "Polishing insights...",
     ];
-    const positions: React.CSSProperties[] = [
-        { top: '-32px', left: '50%', transform: 'translateX(-50%)' },
-        { top: '50%', right: '-160px', transform: 'translateY(-50%)' },
-        { bottom: '-32px', left: '50%', transform: 'translateX(-50%)' },
-        { top: '50%', left: '-160px', transform: 'translateY(-50%)' },
-    ];
 
     const [index, setIndex] = useState(0);
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setIndex((i) => (i + 1) % tooltips.length);
+            setIndex(i => (i + 1) % tooltips.length);
         }, 2500);
         return () => clearInterval(interval);
     }, []);
 
     return (
-        <div className="relative flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-200 to-purple-50">
-            {/* Rotating rings */}
-            <motion.div
-                className="absolute w-40 h-40 border-2 border-purple-300 rounded-full"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
-            />
-            <motion.div
-                className="absolute w-32 h-32 border-2 border-purple-400 rounded-full"
-                animate={{ rotate: -360 }}
-                transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
-            />
-
-            {/* Main spinner */}
-            <motion.div
-                className="relative w-20 h-20 border-8 border-purple-600 border-t-transparent rounded-full"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
-            />
-
-            {/* Tooltip messages */}
-            <AnimatePresence mode="wait">
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
+            {/* Spinner + rings wrapper */}
+            <div className="relative w-40 h-40">
+                {/* Rotating rings */}
                 <motion.div
-                    key={index}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    transition={{ duration: 0.5 }}
-                    className="absolute"
-                    style={positions[index]}
-                >
-                    <div className="bg-purple-600 text-white px-4 py-2 rounded-full shadow-lg text-sm">
-                        {tooltips[index]}
-                    </div>
-                </motion.div>
-            </AnimatePresence>
+                    className="absolute inset-0 border-2 border-purple-300 rounded-full"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
+                />
+                <motion.div
+                    className="absolute inset-4 border-2 border-purple-400 rounded-full"
+                    animate={{ rotate: -360 }}
+                    transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+                />
+
+                {/* Main spinner */}
+                <motion.div
+                    className="absolute inset-8 border-8 border-purple-600 border-t-transparent rounded-full"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+                />
+
+                {/* Tooltip below spinner */}
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.4 }}
+                        className="absolute bottom-[-2.5rem] left-1/2 transform -translate-x-1/2"
+                    >
+                        <div className="bg-purple-600 text-white px-4 py-2 rounded-full shadow-lg text-sm whitespace-nowrap">
+                            {tooltips[index]}
+                        </div>
+                    </motion.div>
+                </AnimatePresence>
+            </div>
         </div>
     );
 };
+
+
 interface ChatMessage {
     role: 'user' | 'assistant';
     content: string;
@@ -289,7 +286,7 @@ const App: React.FC = () => {
     const handleLaunch = async () => {
         if (!message) return;
         setView('loading');
-        const prompt = `You are a competent Analyst that scouts for startup companies. Evaluate ${message} and return a JSON with 'result' object containing scores, justifications, and summary. Use this context: ${pdfText}`;
+        const prompt = `You are a competent Analyst that scouts for startup companies. Evaluate ${message} and return a JSON with 'result' object containing scores, justifications, and summary. Use this context: ${pdfText} REMEMBER, the company is ${message}, it might be called different in the context, please ignore that.`;
         try {
             await chatSend.mutateAsync({ message: prompt });
         } catch { }
@@ -302,12 +299,13 @@ const App: React.FC = () => {
                 <LoadingScreen />
             ) : view === 'landing' ? (
                 <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
+                    <img src="/logo.png" alt="Logo" className="" />
                     <motion.h1
                         className="text-6xl font-extrabold text-white mb-8"
                         animate={{ scale: [1, 1.05, 1], opacity: [0.8, 1, 0.8] }}
                         transition={{ duration: 2, repeat: Infinity }}
                     >
-                        Startups made easy
+                        Smarter startup evaluations, powered by AI.
                     </motion.h1>
                     <button
                         onClick={handleStart}
@@ -317,11 +315,12 @@ const App: React.FC = () => {
                     </button>
                 </div>
             ) : view === 'chat' ? (
-                <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
+                <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
+                    <img src="/logo.png" alt="Logo" className="mb-6" />
                     <UploadContext.Provider value={{ file, setFile }}>
                         <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-3xl">
                             <h1 className="text-3xl font-bold text-center mb-6 text-purple-600">
-                                🤖 Startup Chat
+                                Enter the Companies Name
                             </h1>
                             <textarea
                                 className="w-full border rounded-lg p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-purple-400"
@@ -330,6 +329,7 @@ const App: React.FC = () => {
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                             />
+                            <h2 className="text-lg font-semibold mb-2 text-purple-600">You can also upload additional information.</h2>
                             <FileUpload onFileChange={handleFileChange} />
                             {pdfText && (
                                 <textarea
