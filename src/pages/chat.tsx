@@ -23,56 +23,117 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileChange }) => {
         </label>
     );
 };
+// Dashboard.tsx
 
-// Dashboard component
-interface DashboardProps {
-    scores: Record<string, any>;
-    justifications: Record<string, string>;
+interface CompanyInfo {
+    companyName?: string;
+    logoUrl?: string;
+    founders?: string;
+    fundingStage?: string;
+    fundingAmount?: string;
+    growthRate?: string;
+    productStage?: string;
+    competitors?: string;
+    summary?: string;
 }
-const Dashboard: React.FC<DashboardProps> = ({ scores, justifications }) => {
-    const logo = api.logo.fetchLogo.useQuery({ companyName: "Uber" }, { enabled: false });
-    const comparison: Record<string, number> = {
-        market_score: 6,
-        overall_score: 7,
-        product_score: 7.5,
-        risk_score: 5,
-        team_score: 7,
-        traction_score: 6,
-    };
+
+interface DashboardProps {
+    companyInfo?: CompanyInfo;
+    scores: Record<string, number>;
+    justifications: Record<string, string>;
+    logoUrl?: string;
+}
+
+const Dashboard: React.FC<DashboardProps> = ({
+    companyInfo = {},
+    scores,
+    justifications,
+    logoUrl,
+}) => {
+
+    const placeholderLogo = "https://via.placeholder.com/48?text=Logo";
 
     const metrics = [
-        { key: 'market_score', label: 'Market' },
-        { key: 'overall_score', label: 'Overall' },
-        { key: 'product_score', label: 'Product' },
-        { key: 'risk_score', label: 'Risk' },
-        { key: 'team_score', label: 'Team' },
-        { key: 'traction_score', label: 'Traction' },
+        { key: "team_score", label: "Team" },
+        { key: "market_score", label: "Market" },
+        { key: "product_score", label: "Product" },
+        { key: "traction_score", label: "Traction" },
+        { key: "risk_score", label: "Risk" },
+        { key: "overall_score", label: "Overall" },
     ];
 
+    // If you have comparison data, you can replace 0 with real averages here
+    const comparison: Record<string, number> = {
+        team_score: 0,
+        market_score: 0,
+        product_score: 0,
+        traction_score: 0,
+        risk_score: 0,
+        overall_score: 0,
+    };
+
     return (
-        <div>
-            <div className="flex justify-end items-center mb-4">
-                {logo.data && (
-                    <img
-                        src={logo.data?.logoUrl}
-                        alt="Company Logo"
-                        className="w-12 h-12 rounded-full mr-2"
-                    />
-                )}
-                <h2 className="text-xl font-bold text-purple-600">{false || "Company"}</h2>
+        <div className="space-y-8">
+            {/* Header */}
+            <div className="flex items-center space-x-4">
+                <img
+                    src={logoUrl || placeholderLogo}
+                    alt={`${companyInfo.companyName} logo`}
+                    className="w-12 h-12 rounded-full object-cover"
+                />
+                <div>
+                    <h2 className="text-2xl font-bold text-purple-600">{companyInfo.companyName}</h2>
+                    <p className="text-sm text-gray-600">Founders: {companyInfo.founders}</p>
+                </div>
             </div>
+
+            {/* Key Info */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div className="bg-white p-4 rounded-xl shadow-md">
+                    <h4 className="text-xs font-medium text-gray-500">Funding Stage</h4>
+                    <p className="mt-1 text-lg font-semibold">{companyInfo.fundingStage}</p>
+                </div>
+                <div className="bg-white p-4 rounded-xl shadow-md">
+                    <h4 className="text-xs font-medium text-gray-500">Funding Amount</h4>
+                    <p className="mt-1 text-lg font-semibold">{companyInfo.fundingAmount}</p>
+                </div>
+                <div className="bg-white p-4 rounded-xl shadow-md">
+                    <h4 className="text-xs font-medium text-gray-500">Growth Rate</h4>
+                    <p className="mt-1 text-lg font-semibold">{companyInfo.growthRate}</p>
+                </div>
+                <div className="bg-white p-4 rounded-xl shadow-md">
+                    <h4 className="text-xs font-medium text-gray-500">Product Stage</h4>
+                    <p className="mt-1 text-lg font-semibold">{companyInfo.productStage}</p>
+                </div>
+                <div className="bg-white p-4 rounded-xl shadow-md">
+                    <h4 className="text-xs font-medium text-gray-500">Competitors</h4>
+                    <p className="mt-1 text-lg font-semibold">companyInfo.{companyInfo.competitors}</p>
+                </div>
+            </div>
+
+            {/* Scores */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {metrics.map(({ key, label }) => {
-                    const score = scores[key] || 0;
-                    const comp = comparison[key] || 0;
+                    const score = scores[key] ?? 0;
+                    const avg = comparison[key] ?? 0;
+                    const isOverall = key === "overall_score";
+                    const spanClass = isOverall
+                        ? "col-span-1 md:col-span-2 lg:col-span-3"
+                        : "";
                     return (
-                        <div key={key} className="bg-white p-4 rounded-xl shadow-md">
-                            <h3 className="text-lg font-semibold mb-2 text-purple-600">
+                        <div
+                            key={key}
+                            className={`${spanClass} bg-white p-4 rounded-xl shadow-md`}
+                        >
+                            <h3 className="text-lg font-semibold text-purple-600 mb-2">
                                 {label} Score: {score}
                             </h3>
-                            <div className="space-y-1 mb-2">
-                                <div className="flex justify-between text-sm mb-1">
-                                    <span>You</span><span>{score}</span>
+                            {/* Your existing bar chart code */}
+                            <div className="space-y-2 mb-2">
+                                {/* You */}
+                                <div className="flex justify-between text-sm">
+                                    <span>You</span>
+                                    <span>{score}</span>
                                 </div>
                                 <div className="w-full bg-gray-200 rounded-full h-3">
                                     <div
@@ -80,47 +141,60 @@ const Dashboard: React.FC<DashboardProps> = ({ scores, justifications }) => {
                                         style={{ width: `${(score / 10) * 100}%` }}
                                     />
                                 </div>
-                                <div className="flex justify-between text-sm mt-2 mb-1">
-                                    <span>Average</span><span>{comp}</span>
+                                {/* Average */}
+                                <div className="flex justify-between text-sm">
+                                    <span>Average</span>
+                                    <span>{avg}</span>
                                 </div>
                                 <div className="w-full bg-gray-200 rounded-full h-3">
                                     <div
                                         className="bg-gray-400 h-3 rounded-full"
-                                        style={{ width: `${(comp / 10) * 100}%` }}
+                                        style={{ width: `${(avg / 10) * 100}%` }}
                                     />
                                 </div>
                             </div>
                             <details className="mt-2">
-                                <summary className="cursor-pointer text-sm text-gray-700">Justification</summary>
+                                <summary className="cursor-pointer text-sm text-gray-700">
+                                    Justification
+                                </summary>
                                 <p className="mt-1 text-sm text-gray-600">
-                                    {justifications[key]
-                                        ? justifications[key]
-                                        : "No justification provided."}
+                                    {justifications[key] ?? "No justification provided."}
                                 </p>
                             </details>
                         </div>
                     );
                 })}
-                <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-white p-4 rounded-xl shadow-md">
-                    <h3 className="text-lg font-semibold text-purple-600 mb-2">
-                        Executive Summary
-                    </h3>
-                    <p className="text-gray-700 whitespace-pre-wrap">
-                        {scores.summary || 'No summary available.'}
-                    </p>
-                </div>
+            </div>
+
+            {/* Executive Summary */}
+            <div className="bg-white p-4 rounded-xl shadow-md">
+                <h3 className="text-lg font-semibold text-purple-600 mb-2">
+                    Executive Summary
+                </h3>
+                <p className="text-gray-700 whitespace-pre-wrap">{companyInfo.summary}</p>
             </div>
         </div>
     );
-
 };
+
 
 const LoadingScreen: React.FC = () => {
     const tooltips = [
-        "Analyzing data...",
-        "Crunching numbers...",
-        "Evaluating risk...",
-        "Polishing insights...",
+        "Leverage your network: attend industry meetups and demo days to discover promising startups early.",
+        "Validate the problem: ensure the startup is solving a real pain point before diving in deeper.",
+        "Perform competitive analysis: map out the landscape to spot the next unicorn in the making.",
+        "Track funding rounds: follow platforms like Crunchbase or AngelList to see which startups are raising capital.",
+        "Use social listening: monitor Twitter and LinkedIn for chatter around emerging companies.",
+        "Evaluate the team: look for founders with proven track records and complementary skill sets.",
+        "Assess market size: big markets breed unicorns—seek startups tackling billion-dollar industries.",
+        "Check traction metrics: monthly active users, revenue growth, and churn rates reveal true momentum.",
+        "Dive into product demos: hands-on trials uncover which solutions have that magical unicorn spark.",
+        "Stay curious: subscribe to newsletters like TechCrunch or Product Hunt to spot early-stage gems.",
+        "Network with investors: angel and VC communities often share insider tips on potential unicorns.",
+        "Monitor exit activity: acquisitions and IPO filings can signal which startups might join the unicorn club.",
+        "Encourage feedback loops: maintain open communication channels with founders to help their growth.",
+        "Scale sensibly: advise startups to balance rapid growth with operational stability to avoid flaming out.",
+        "Celebrate milestones: recognizing progress—no matter how small—can keep teams motivated toward unicorn status."
     ];
 
     const [index, setIndex] = useState(0);
@@ -366,6 +440,7 @@ const App: React.FC = () => {
                         <Dashboard
                             scores={resultData}
                             justifications={resultData.justifications}
+                            companyInfo={resultData.companyInfo}
                         />
                     </div>
                     <AnimatePresence>
