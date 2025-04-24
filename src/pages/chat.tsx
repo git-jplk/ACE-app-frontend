@@ -70,12 +70,12 @@ const Dashboard: React.FC<DashboardProps> = ({
 
     // If you have comparison data, you can replace 0 with real averages here
     const comparison: Record<string, number> = {
-        team_score: 0,
-        market_score: 0,
-        product_score: 0,
-        traction_score: 0,
-        risk_score: 0,
-        overall_score: 0,
+        team_score: 6,
+        market_score: 5,
+        product_score: 6,
+        traction_score: 7,
+        risk_score: 4,
+        overall_score: 6,
     };
 
     return (
@@ -83,14 +83,13 @@ const Dashboard: React.FC<DashboardProps> = ({
             {/* Header */}
             <div className="flex items-center space-x-4">
                 <img
-                    src={logoUrl}
-                    alt={`${companyInfo.company_name} logo`}
+                    src={logoUrl || "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/company-logo-design-template-19959eda128d9fff1d1f7785460e3a73_screen.jpg?ts=1676285899"}
+                    alt={`${companyInfo.company_name || "Company"} logo`}
                     className="w-50 h-50 rounded-full"
+                    onError={(e) => {
+                        (e.target as HTMLImageElement).src = "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/company-logo-design-template-19959eda128d9fff1d1f7785460e3a73_screen.jpg?ts=1676285899";
+                    }}
                 />
-                <div>
-                    <h2 className="text-2xl font-bold text-purple-600">{companyInfo.company_name}</h2>
-                    <p className="text-sm text-gray-600">Founders: {companyInfo.founder_name}</p>
-                </div>
             </div>
 
 
@@ -189,21 +188,21 @@ const Dashboard: React.FC<DashboardProps> = ({
 
 const LoadingScreen: React.FC = () => {
     const tooltips = [
-        "Leverage your network: attend industry meetups and demo days to discover promising startups early.",
-        "Validate the problem: ensure the startup is solving a real pain point before diving in deeper.",
-        "Perform competitive analysis: map out the landscape to spot the next unicorn in the making.",
-        "Track funding rounds: follow platforms like Crunchbase or AngelList to see which startups are raising capital.",
-        "Use social listening: monitor Twitter and LinkedIn for chatter around emerging companies.",
-        "Evaluate the team: look for founders with proven track records and complementary skill sets.",
-        "Assess market size: big markets breed unicorns—seek startups tackling billion-dollar industries.",
-        "Check traction metrics: monthly active users, revenue growth, and churn rates reveal true momentum.",
-        "Dive into product demos: hands-on trials uncover which solutions have that magical unicorn spark.",
-        "Stay curious: subscribe to newsletters like TechCrunch or Product Hunt to spot early-stage gems.",
-        "Network with investors: angel and VC communities often share insider tips on potential unicorns.",
-        "Monitor exit activity: acquisitions and IPO filings can signal which startups might join the unicorn club.",
-        "Encourage feedback loops: maintain open communication channels with founders to help their growth.",
-        "Scale sensibly: advise startups to balance rapid growth with operational stability to avoid flaming out.",
-        "Celebrate milestones: recognizing progress—no matter how small—can keep teams motivated toward unicorn status."
+        "attend industry meetups and demo days to discover promising startups early.",
+        "ensure the startup is solving a real pain point before diving in deeper.",
+        "map out the landscape to spot the next unicorn in the making.",
+        "follow platforms like Crunchbase or AngelList to see which startups are raising capital.",
+        "monitor Twitter and LinkedIn for chatter around emerging companies.",
+        "look for founders with proven track records and complementary skill sets.",
+        "big markets breed unicorns—seek startups tackling billion-dollar industries.",
+        "monthly active users, revenue growth, and churn rates reveal true momentum.",
+        "hands-on trials uncover which solutions have that magical unicorn spark.",
+        "subscribe to newsletters like TechCrunch or Product Hunt to spot early-stage gems.",
+        "angel and VC communities often share insider tips on potential unicorns.",
+        "acquisitions and IPO filings can signal which startups might join the unicorn club.",
+        "maintain open communication channels with founders to help their growth.",
+        "advise startups to balance rapid growth with operational stability to avoid flaming out.",
+        "recognizing progress—no matter how small—can keep teams motivated toward unicorn status."
     ];
 
     const [index, setIndex] = useState(0);
@@ -245,7 +244,7 @@ const LoadingScreen: React.FC = () => {
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.4 }}
+                        transition={{ duration: 0.7, ease: 'easeInOut' }}
                         className="absolute bottom-[-2.5rem] left-1/2 transform -translate-x-1/2"
                     >
                         <div className="bg-purple-600 text-white px-4 py-2 rounded-full shadow-lg text-sm whitespace-nowrap">
@@ -414,13 +413,6 @@ const App: React.FC = () => {
                             />
                             <h2 className="text-lg font-semibold mb-2 text-purple-600">You can also upload additional information.</h2>
                             <FileUpload onFileChange={handleFileChange} />
-                            {pdfText && (
-                                <textarea
-                                    className="w-full h-40 mt-4 p-2 border rounded-lg bg-gray-50"
-                                    readOnly
-                                    value={pdfText}
-                                />
-                            )}
                             <button
                                 onClick={handleLaunch}
                                 className="w-full mt-4 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition"
