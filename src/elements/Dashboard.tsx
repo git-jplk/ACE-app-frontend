@@ -64,6 +64,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     }}
                 />
             </div>
+            <div>
+                <h2 className="text-2xl font-bold text-purple-600">{companyInfo.company_name}</h2>
+                <p className="text-sm text-gray-600">Founders: {companyInfo.founder_name}</p>
+            </div>
 
 
 
