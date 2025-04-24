@@ -1,7 +1,7 @@
 import React, { useState, useEffect, createContext, useContext, type ChangeEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { api } from "~/utils/api";
-
+import { ReactSVG } from 'react-svg';
 // Context for file upload
 export type UploadContextType = {
     file: File | null;
@@ -26,20 +26,27 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileChange }) => {
 // Dashboard.tsx
 
 interface CompanyInfo {
-    companyName?: string;
-    logoUrl?: string;
-    founders?: string;
-    fundingStage?: string;
-    fundingAmount?: string;
-    growthRate?: string;
-    productStage?: string;
+    company_name?: string;
+    founder_name?: string;
+    funding_stage?: string;
+    funding_amount?: string;
+    growth_rate?: string;
+    product_stage?: string;
     competitors?: string;
+}
+interface Scores {
+    market_score?: number;
+    product_score?: number;
+    traction_score?: number;
+    risk_score?: number;
+    overall_score?: number;
+    team_score?: number;
     summary?: string;
 }
 
 interface DashboardProps {
     companyInfo?: CompanyInfo;
-    scores: Record<string, number>;
+    scores: Scores,
     justifications: Record<string, string>;
     logoUrl?: string;
 }
@@ -48,18 +55,17 @@ const Dashboard: React.FC<DashboardProps> = ({
     companyInfo = {},
     scores,
     justifications,
-    logoUrl,
+    logoUrl = "https://via.placeholder.com/48?text=Logo"
 }) => {
 
-    const placeholderLogo = "https://via.placeholder.com/48?text=Logo";
 
     const metrics = [
-        { key: "team_score", label: "Team" },
-        { key: "market_score", label: "Market" },
-        { key: "product_score", label: "Product" },
-        { key: "traction_score", label: "Traction" },
-        { key: "risk_score", label: "Risk" },
-        { key: "overall_score", label: "Overall" },
+        { key: "overall_score", label: "Overall", value: scores.overall_score ?? 0 },
+        { key: "market_score", label: "Market", value: scores.market_score ?? 0 },
+        { key: "product_score", label: "Product", value: scores.product_score ?? 0 },
+        { key: "traction_score", label: "Traction", value: scores.traction_score ?? 0 },
+        { key: "risk_score", label: "Risk", value: scores.risk_score ?? 0 },
+        { key: "team_score", label: "Team", value: scores.team_score ?? 0 },
     ];
 
     // If you have comparison data, you can replace 0 with real averages here
@@ -77,44 +83,52 @@ const Dashboard: React.FC<DashboardProps> = ({
             {/* Header */}
             <div className="flex items-center space-x-4">
                 <img
-                    src={logoUrl || placeholderLogo}
-                    alt={`${companyInfo.companyName} logo`}
-                    className="w-12 h-12 rounded-full object-cover"
+                    src={logoUrl}
+                    alt={`${companyInfo.company_name} logo`}
+                    className="w-50 h-50 rounded-full"
                 />
                 <div>
-                    <h2 className="text-2xl font-bold text-purple-600">{companyInfo.companyName}</h2>
-                    <p className="text-sm text-gray-600">Founders: {companyInfo.founders}</p>
+                    <h2 className="text-2xl font-bold text-purple-600">{companyInfo.company_name}</h2>
+                    <p className="text-sm text-gray-600">Founders: {companyInfo.founder_name}</p>
                 </div>
             </div>
+
+
 
             {/* Key Info */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 <div className="bg-white p-4 rounded-xl shadow-md">
                     <h4 className="text-xs font-medium text-gray-500">Funding Stage</h4>
-                    <p className="mt-1 text-lg font-semibold">{companyInfo.fundingStage}</p>
+                    <p className="mt-1 text-lg font-semibold">{companyInfo.funding_stage}</p>
                 </div>
                 <div className="bg-white p-4 rounded-xl shadow-md">
                     <h4 className="text-xs font-medium text-gray-500">Funding Amount</h4>
-                    <p className="mt-1 text-lg font-semibold">{companyInfo.fundingAmount}</p>
+                    <p className="mt-1 text-lg font-semibold">{companyInfo.funding_amount}</p>
                 </div>
                 <div className="bg-white p-4 rounded-xl shadow-md">
                     <h4 className="text-xs font-medium text-gray-500">Growth Rate</h4>
-                    <p className="mt-1 text-lg font-semibold">{companyInfo.growthRate}</p>
+                    <p className="mt-1 text-lg font-semibold">{companyInfo.growth_rate}</p>
                 </div>
                 <div className="bg-white p-4 rounded-xl shadow-md">
                     <h4 className="text-xs font-medium text-gray-500">Product Stage</h4>
-                    <p className="mt-1 text-lg font-semibold">{companyInfo.productStage}</p>
+                    <p className="mt-1 text-lg font-semibold">{companyInfo.product_stage ?? ""}</p>
                 </div>
                 <div className="bg-white p-4 rounded-xl shadow-md">
                     <h4 className="text-xs font-medium text-gray-500">Competitors</h4>
-                    <p className="mt-1 text-lg font-semibold">companyInfo.{companyInfo.competitors}</p>
+                    <p className="mt-1 text-lg font-semibold">{companyInfo.competitors}</p>
                 </div>
+            </div>
+            <div className="bg-white p-4 rounded-xl shadow-md">
+                <h3 className="text-lg font-semibold text-purple-600 mb-2">
+                    Executive Summary
+                </h3>
+                <p className="text-gray-700 whitespace-pre-wrap">{scores.summary}</p>
             </div>
 
             {/* Scores */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {metrics.map(({ key, label }) => {
-                    const score = scores[key] ?? 0;
+                {metrics.map(({ key, label, value }) => {
+                    const score = value
                     const avg = comparison[key] ?? 0;
                     const isOverall = key === "overall_score";
                     const spanClass = isOverall
@@ -167,12 +181,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             </div>
 
             {/* Executive Summary */}
-            <div className="bg-white p-4 rounded-xl shadow-md">
-                <h3 className="text-lg font-semibold text-purple-600 mb-2">
-                    Executive Summary
-                </h3>
-                <p className="text-gray-700 whitespace-pre-wrap">{companyInfo.summary}</p>
-            </div>
+
         </div>
     );
 };
@@ -438,9 +447,18 @@ const App: React.FC = () => {
                         </button>
 
                         <Dashboard
-                            scores={resultData}
+                            scores={{
+                                market_score: resultData?.market_score ?? 0,
+                                product_score: resultData?.product_score ?? 0,
+                                traction_score: resultData?.traction_score ?? 0,
+                                risk_score: resultData?.risk_score ?? 0,
+                                overall_score: resultData?.overall_score ?? 0,
+                                team_score: resultData?.team_score ?? 0,
+                                summary: resultData?.summary ?? "",
+                            }}
                             justifications={resultData.justifications}
-                            companyInfo={resultData.companyInfo}
+                            companyInfo={resultData.company_info}
+                            logoUrl={resultData.logo_url}
                         />
                     </div>
                     <AnimatePresence>
